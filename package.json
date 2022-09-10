@@ -1,0 +1,26 @@
+{
+  "name": "wumpuscore",
+  "version": "1.0.0",
+  "license": "ISC",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./typings/index.d.ts",
+  "scripts": {
+    "start": "ts-node src/core/",
+    "build": "tsc",
+    "test": "discore"
+  },
+  "dependencies": {
+    "discord.js": "^14.3.0",
+    "dotenv": "^16.0.2",
+    "pino": "^8.5.0",
+    "pino-pretty": "^9.1.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.11"
+  },
+  "bin": "./dist/core/index.js"
+}
