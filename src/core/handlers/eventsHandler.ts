@@ -2,8 +2,8 @@ import { readdirSync } from "fs";
 import { join as joinPath } from "path";
 
 import { Logger, Package, unpack } from "../utils";
-import { IntentsManager } from "../managers/IntentsManager";
-import { Event, Handler } from "../structures";
+import Handler from "../structures/Handler";
+import Event from "../structures/Event";
 
 export default class implements Handler {
     async preload() {
@@ -25,8 +25,6 @@ export default class implements Handler {
         }
         
         function registerEvent(event: Event<any>) {
-            IntentsManager.pushIntentsByEvent(event.type);
-            
             Logger.debug(`EventsHandler: ${event.name} loaded`);
 
             try {

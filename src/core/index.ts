@@ -8,7 +8,8 @@ dotenv.config({ path: joinPath(ROOT_PATH, '.env') });
 import * as handlers from './handlers';
 import { Logger, envVar } from './utils';
 import { IntentsManager } from './managers/IntentsManager';
-import { Handler, Bot } from './structures';
+import Bot from './structures/Bot';
+import Handler from './structures/Handler';
 
 export const bot = new Bot({ intents: [] });
 
@@ -36,6 +37,8 @@ Handler.set({ bot, rootPath: ROOT_PATH });
     });
     
     bot.options.intents = IntentsManager.intents;
+
+    console.log(bot.options)
 
     bot.login(TOKEN);
 })();

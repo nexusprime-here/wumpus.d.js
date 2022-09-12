@@ -1,25 +1,34 @@
 import { GatewayIntentsString, IntentsBitField } from 'discord.js';
+import Intent from '../../structures/Intent';
 import { Logger } from '../../utils';
-import data from './data.json';
+import * as data from './data';
 
 export class IntentsManager {
-    static intents: number = 1;
+    static intents: number = 0;
     private static usedIntents: string[] = [];
     
     static pushIntentsByEvent(selectedEvent: string) {
-        for(const [intent, events] of Object.entries(data)) {
-            if(events.includes(selectedEvent)) {
-                Logger.debug('Intent loaded: ' + intent);
+        const walkIn = (data: Intent[], isRequire: boolean = false) => {
+            for(const intent of data) {
+                if(isRequire || intent.events.includes(selectedEvent)) {
+                    if(this.usedIntents.find(i => i === intent.name)) {
+                        continue;
+                    } else {
+                        Logger.debug('Intent loaded: ' + intent.name);
 
-                if(this.usedIntents.find(i => i === intent)) {
-                    continue;
+                        if(intent.require) {
+                            walkIn(intent.require, true);
+                        }
+
+                        this.usedIntents.push(intent.name);
+                        this.intents += IntentsBitField.resolve(<GatewayIntentsString>intent.name);
+                    }
                 } else {
-                    this.usedIntents.push(intent);
-                    this.intents += IntentsBitField.resolve(<GatewayIntentsString>intent);
+                    continue;
                 }
-            } else {
-                continue;
             }
         }
+
+        walkIn(Object.values(data))
     }
 }

@@ -2,7 +2,8 @@ import { InteractionType } from "discord.js";
 import { readdirSync } from "fs";
 import { join as joinPath } from "path";
 
-import { Command, Handler } from "../structures";
+import Event from "../structures/Event";
+import Command from "../structures/Command";
 import { Package, Logger, unpack } from "../utils";
 
 export default class implements Handler {
