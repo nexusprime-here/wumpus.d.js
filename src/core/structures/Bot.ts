@@ -1,18 +1,10 @@
 import { Client, ClientOptions, Guild } from "discord.js";
 import { CollectionManager } from "../managers/CollectionManager";
-import { logger } from "../utils";
+import { envVar } from "../utils";
 import Command from "./Command";
 import Event from "./Event";
 
-const TEST_GUILD = function() {
-    const TEST_GUILD = process.env.TEST_GUILD;
-
-    if(!TEST_GUILD) {
-        logger.warn('TEST_GUILD var not specified in .env');
-    }
-
-    return TEST_GUILD;
-}();
+const TEST_GUILD = envVar('TEST_GUILD');
 
 export default class Bot<Ready extends boolean = boolean> extends Client<Ready> {
     public commands = new CollectionManager<Command>();

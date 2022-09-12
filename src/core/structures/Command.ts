@@ -19,8 +19,8 @@ export default class Command {
     test?: boolean = false;
     run: (options: CommandHandlerOptions) => any;
 
-    static build(command: Command) {
-        bot.emit('commandBuild', command);
+    static build(commandObj: Command) {
+        bot.emit('commandBuild', new this(commandObj));
     }
 
     constructor(obj: Command) {

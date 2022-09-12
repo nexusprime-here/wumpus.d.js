@@ -1,9 +1,13 @@
 import Bot from "./Bot";
 
 export default class Handler {
-    declare run: (bot: Bot, path: string) => any;
-
-    constructor(obj: Handler) {
+    static set(obj: Omit<typeof Handler, 'set' | 'prototype'>) {
         Object.assign(this, obj);
     }
+    
+    static bot: Bot;
+    static rootPath: string;
+
+    declare preload: () => any
+    declare load: () => any
 }

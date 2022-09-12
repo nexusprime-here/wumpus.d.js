@@ -1,2 +1,2 @@
-export { default as commands } from './commandsHandler';
-export { default as events } from './eventsHandler';
+export { default as commands } from './CommandsHandler';
+export { default as events } from './EventsHandler';

@@ -1,43 +1,39 @@
-#! /usr/bin/env node
+import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { join as joinPath } from 'path';
 
 const ROOT_PATH = process.cwd();
-
-import dotenv from 'dotenv';
-import { join as joinPath } from 'path';
 dotenv.config({ path: joinPath(ROOT_PATH, '.env') });
 
-import { existsSync } from 'fs';
 import * as handlers from './handlers';
-import { logger } from './utils';
-import Bot from './structures/Bot';
+import { Logger, envVar } from './utils';
 import { IntentsManager } from './managers/IntentsManager';
-
-const TOKEN = function() {
-    const TOKEN = process.env.TOKEN;
-
-    if(!TOKEN) {
-        logger.error('Missing TOKEN var in .env');
-        process.exit();
-    }
-
-    return TOKEN;
-}();
+import { Handler, Bot } from './structures';
 
 export const bot = new Bot({ intents: [] });
 
-bot.once('ready', () => {
-    logger.info(`Bot logged as ${bot.user ? bot.user.tag : 'Anonymous#0000'}`);
-});
+const TOKEN = envVar('TOKEN', true);
+
+Handler.set({ bot, rootPath: ROOT_PATH });
 
 (async function() {
-    type HandlersKeys = (keyof typeof handlers)[];
-    for (let handlerName of <HandlersKeys>Object.keys(handlers)) {
+    let handlersCache: any[] = [];
+
+    for (let handlerName of <(keyof typeof handlers)[]>Object.keys(handlers)) {
         let dirExist = existsSync(joinPath(ROOT_PATH, handlerName));
         if(!dirExist) continue;
     
-        await handlers[handlerName].run(bot, ROOT_PATH);
-    }
+        let handler = new handlers[handlerName];
+        await handler.preload();
 
+        handlersCache.push(handler);
+    }
+    
+    bot.once('ready', () => {
+        handlersCache.forEach(h => h.load());
+
+        Logger.ready(`Bot logged as ${bot.user?.tag}\n`);
+    });
     bot.options.intents = IntentsManager.intents;
 
     bot.login(TOKEN);

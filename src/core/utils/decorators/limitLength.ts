@@ -1,4 +1,4 @@
-import logger from "../logger";
+import { Logger } from "../";
 
 export default function limitLength({ min = 1, max }: { min?: number, max: number}) {
     return (target: any, propertyKey: string) => {
@@ -10,11 +10,11 @@ export default function limitLength({ min = 1, max }: { min?: number, max: numbe
             },
             set(v) {
                 if(v.length < min) {
-                    logger.error(`${propertyKey} of ${target.constructor.name} doesn't have enough characters`)
+                    Logger.error(`${propertyKey} of ${target.constructor.name} doesn't have enough characters`)
                     process.exit();
                 }
                 else if(v.length >= max) {
-                    logger.error(`${propertyKey} of ${target.constructor.name} has many characters`)
+                    Logger.error(`${propertyKey} of ${target.constructor.name} has many characters`)
                     process.exit();
                 }
                 else value = v;

@@ -2,41 +2,31 @@ import { InteractionType } from "discord.js";
 import { readdirSync } from "fs";
 import { join as joinPath } from "path";
 
-import Handler from "../structures/Handler";
-import { Package, logger, unpack } from "../utils";
-import Command from "../structures/Command";
+import { Command, Handler } from "../structures";
+import { Package, Logger, unpack } from "../utils";
 
-export default new Handler({
-    async run(bot, rootPath) {
-        logger.info('CommandHandler: On');
+export default class implements Handler {
+    async preload() {
+        let { bot, rootPath } = Handler;
+
+        Logger.debug('CommandsHandler: On');
         const dirpath = joinPath(rootPath, 'commands');
-
+    
         bot.on('commandBuild', (command: Command) => {
-            logger.info(`CommandHandler: ${command.name} loaded`);
-
+            Logger.debug(`CommandsHandler: ${command.name} loaded`);
+    
             bot.commands.create(command);
         });
-
+    
         for(let fileName of readdirSync(dirpath)) {
-            const PackagedCommand: Package<Command> = await import(joinPath(dirpath, fileName));
-            const file = unpack(PackagedCommand);
-            if(!file) continue;
-
-            logger.info(`CommandHandler: ${file.name} loaded`);
-
-            bot.commands.create(file);
+            const packagedCommand: Package<Command> = await import(joinPath(dirpath, fileName));
+            const command = unpack(packagedCommand);
+            if(!command) continue;
+    
+            Logger.debug(`CommandsHandler: ${command.name} loaded`);
+    
+            bot.commands.create(command);
         }
-
-        bot.once('ready', async () => {
-            for(let command of bot.commands.cache.values()) {
-                let commandsCache = await bot.application?.commands.fetch();
-                let hasCommand = !!commandsCache?.find(c => c.name === command.name);
-    
-                if(hasCommand) continue;
-    
-                registerCommand(command);
-            }
-        });
 
         bot.on('interactionCreate', async interaction => {
             if(interaction.type !== InteractionType.ApplicationCommand) return;
@@ -45,23 +35,28 @@ export default new Handler({
 
             try {
                 await command.run({ interaction, bot });
-            } catch (err) {
-                logger.error(err);
+            } catch (err: any) {
+                Logger.error('Command failed', err);
             }
         });
+    }
+    async load(global: boolean = false) {
+        let { bot } = Handler;
+        for(let command of bot.commands.cache.values()) {
+            if(command.test) await bot.testGuild?.commands.create({
+                name: command.name,
+                description: command.description,
+                options: command.options,
+            });
+            else {
+                if(!global) return;
 
-        
-        function registerCommand(command: Command) {
-            if(command.test) return bot.testGuild?.commands.create({
-                name: command.name,
-                description: command.description,
-                options: command.options,
-            });
-            else return bot.application?.commands.create({
-                name: command.name,
-                description: command.description,
-                options: command.options,
-            });
+                await bot.application?.commands.create({
+                    name: command.name,
+                    description: command.description,
+                    options: command.options,
+                });
+            }
         }
     }
-})
+}

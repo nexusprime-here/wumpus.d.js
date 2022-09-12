@@ -3,3 +3,4 @@ src/
 tsconfig.json
 yarn.lock
 package-lock.json
+test/

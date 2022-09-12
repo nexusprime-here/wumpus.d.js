@@ -1,14 +1,15 @@
 import { readdirSync } from "fs";
 import { join as joinPath } from "path";
 
-import { logger, Package, unpack } from "../utils";
+import { Logger, Package, unpack } from "../utils";
 import { IntentsManager } from "../managers/IntentsManager";
-import Handler from "../structures/Handler";
-import Event from "../structures/Event";
+import { Event, Handler } from "../structures";
 
-export default new Handler({
-    async run(bot, rootPath) {
-        logger.info('EventsHandler: On');
+export default class implements Handler {
+    async preload() {
+        let { bot, rootPath } = Handler;
+        
+        Logger.debug('EventsHandler: On');
         const dirpath = joinPath(rootPath, 'events');
         
         bot.on('eventBuild', (event: Event<any>) => {
@@ -16,25 +17,26 @@ export default new Handler({
         });
 
         for(let fileName of readdirSync(dirpath)) {
-            const PackagedEvent: Package<Event<any>> = await import(joinPath(dirpath, fileName));
-            const file = unpack(PackagedEvent);
-            if(!file) continue;
+            const packagedEvent: Package<Event<any>> = await import(joinPath(dirpath, fileName));
+            const event = unpack(packagedEvent);
+            if(!event) continue;
             
-            registerEvent(file);
+            registerEvent(event);
         }
         
         function registerEvent(event: Event<any>) {
             IntentsManager.pushIntentsByEvent(event.type);
             
-            logger.info(`EventHandler: ${event.name} loaded`);
+            Logger.debug(`EventsHandler: ${event.name} loaded`);
 
             try {
                 bot.events.create(event);
 
                 bot[event.once ? 'once' : 'on'](event.type, (...args) => event.run({ bot }, ...args));
-            } catch(err) {
-                logger.error(err);
+            } catch(err: any) {
+                Logger.error('Event failed', err);
             }
         }
-    },
-})
+    }
+    load() {}
+}
