@@ -34,6 +34,7 @@ Handler.set({ bot, rootPath: ROOT_PATH });
 
         Logger.ready(`Bot logged as ${bot.user?.tag}\n`);
     });
+    
     bot.options.intents = IntentsManager.intents;
 
     bot.login(TOKEN);

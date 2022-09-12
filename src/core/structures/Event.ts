@@ -8,30 +8,43 @@ interface EventHandlerOptions {
 }
 
 export default class Event<K extends keyof ClientEvents> {
+    /**
+     * Event identification name /
+     * Nome de identificação do evento
+     */
     @limitLength({ max: 32 })
     public name: string;
 
+    /**
+     * Event that will be listened /
+     * Evento que será ouvido
+     */
     type: K;
 
-    @limitLength({ max: 100 })
-    description: string;
-
+    /**
+     * If is true, the event will be listened just one time /
+     * Se for true, o evento será ouvido apenas uma vez
+     */
     once: boolean = false;
-    forDm: 'only' | boolean = false;
-    forGuild: boolean = true;
+
+    /**
+     * The function that will executed when event called /
+     * A função que será executada quando o evento for chamado
+     */
     run: (options: EventHandlerOptions, ...args: ClientEvents[K]) => any;
 
+    /**
+     * Function to create the event /
+     * Função para criar o evento
+     */
     static build<K extends keyof ClientEvents>(eventObj: Event<K>) {
-        bot.emit('eventBuild', new Event(eventObj));
+        bot.emit('eventBuild', new this(eventObj));
     }
 
     constructor(obj: Event<K>) {
         this.name = obj.name;
-        this.description = obj.description;
         this.type = obj.type;
         if(typeof obj.once === 'boolean') this.once = obj.once;
-        if(obj.forDm === 'only' || typeof obj.forDm === 'boolean') this.forDm = obj.forDm;
-        if(typeof obj.forGuild === 'boolean') this.forGuild = obj.forGuild;
         this.run = obj.run;
     }
 }
