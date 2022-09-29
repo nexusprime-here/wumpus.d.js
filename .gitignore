@@ -2,5 +2,5 @@ node_modules/
 lib/
 typings/
 yarn.lock
+**/.env
 package-lock.json
-test/
