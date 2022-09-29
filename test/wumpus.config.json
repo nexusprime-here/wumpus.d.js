@@ -1,0 +1,6 @@
+{
+    "handlers": {
+        "commands": true,
+        "events": true
+    }
+}

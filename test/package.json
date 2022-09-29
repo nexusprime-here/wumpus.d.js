@@ -1,0 +1,17 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "caller-path": "^4.0.0",
+    "wumpuscore": "../"
+  },
+  "scripts": {
+    "test": "wumpus",
+    "test:path": "ts-node ../src --debug"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
