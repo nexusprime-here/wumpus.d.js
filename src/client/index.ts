@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { Awaitable, Client, ClientEvents, ClientOptions, Guild } from "discord.js";
-import { CacheManager, ConfigManager, IntentsManager, HandlerManager } from "../managers";
+import { CacheManager, ConfigManager, HandlerManager } from "../managers";
 import { EnvVar } from "../utils";
 import path from 'path';
 
@@ -12,34 +12,38 @@ const TEST_GUILD = EnvVar('TEST_GUILD');
 
 export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready> {
     /**
-     * Path of the folder where it was run /
-     * Caminho da pasta onde foi executado
-     */
-    public rootPath = ROOT_PATH;
-
-    /**
      * Guild for test slash commands /
      * Servidor para testar comandos de barra
      */
     public testGuild?: Guild;
-
+    
     /**
      * If client is connected /
      * Se o cliente está conectado
      */
     public connected: boolean = false;
-
+    
     /**
      * Config of Framework /
      * Configuração do Framework
      */
-    public config = new ConfigManager(this.rootPath, 'wumpus.config.json');
+    public config = new ConfigManager(ROOT_PATH, 'wumpus.config.json');
 
+    /**
+     * Path of the folder where it was run /
+     * Caminho da pasta onde foi executado
+     */
+    public targetPath = (() => {
+        const rootPath = ROOT_PATH;
+
+        return path.resolve(rootPath, this.config.targetDir);
+    })();
+    
     /**
      * Active or disable commands and events /
      * Ativa ou desativa comandos e eventos
      */
-    public cache = new CacheManager(this.rootPath);
+    public cache = new CacheManager(ROOT_PATH);
 
     /**
      * Folders that will have the exported files /
@@ -47,13 +51,12 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
      */
     public handlers: HandlerManager;
 
-    constructor(options: ClientOptions = { intents: [] }) {
-        super(options);
+    constructor(options?: ClientOptions) {
+        super((() => options = { intents: this.config.intents })());
 
-        new IntentsManager(this);
         this.handlers = new HandlerManager({
             client: this,
-            path: this.rootPath,
+            path: this.targetPath,
             config: this.config.handlers
         });
     }
@@ -81,8 +84,6 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
     public on(event: unknown, listener: unknown): this {
         let bot = super.on(<string>event, <any>listener);
 
-        IntentsManager.pushByEvent(<string>event);
-
         return bot;
     }
     
@@ -90,8 +91,6 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
     public once<S extends string | symbol>(event: Exclude<S, keyof ClientEvents>, listener: (...args: any[]) => Awaitable<void>): this;
     public once(event: unknown, listener: unknown): this {
         let bot = super.on(<string>event, <any>listener);
-    
-        IntentsManager.pushByEvent(<string>event);
     
         return bot;
     }

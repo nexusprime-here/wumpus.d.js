@@ -6,7 +6,6 @@ interface EventHandlerOptions {
     client: WumpusClient
 }
 
-
 export class Event<K extends keyof ClientEvents = any> {
     /**
      * Event identification name /

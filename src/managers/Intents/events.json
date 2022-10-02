@@ -1,0 +1,107 @@
+{
+    "MessageContent": [
+        "messageCreate",
+        "messageUpdate",
+        "messageDelete",
+        "messageDeleteBulk"
+    ],
+    "Guilds": [
+        "guildCreate",
+        "guildUpdate",
+        "guildDelete",
+        "roleCreate",
+        "roleUpdate",
+        "roleDelete",
+        "channelCreate",
+        "channelUpdate",
+        "channelDelete",
+        "channelPinsUpdate",
+        "threadCreate",
+        "threadUpdate",
+        "threadDelete",
+        "threadListSync",
+        "threadMemberUpdate",
+        "threadMembersUpdate",
+        "stageInstanceCreate",
+        "stageInstanceUpdate",
+        "stageInstanceDelete"
+    ],
+    "GuildMembers": [
+        "guildMemberAdd",
+        "guildMemberUpdate",
+        "guildMemberRemove",
+        "threadMembersUpdate"
+    ],
+    "GuildWebhooks": [
+        "webhookUpdate"
+    ],
+    "GuildIntegrations": [
+        "guildIntegrationsUpdate",
+        "integrationCreate",
+        "integrationUpdate",
+        "integrationDelete"
+    ],
+    "GuildEmojisAndStickers": [
+        "guildEmojisUpdate",
+        "guildStickersUpdate"
+    ],
+    "GuildBans": [
+        "guildBanAdd",
+        "guildBanRemove"
+    ],
+    "GuildInvites": [
+        "inviteCreate",
+        "inviteDelete"
+    ],
+    "GuildVoiceStates": [
+        "voiceStateUpdate"
+    ],
+    "GuildPresences": [
+        "presenceUpdate"
+    ],
+    "GuildMessages": [
+        "messageCreate",
+        "messageUpdate",
+        "messageDelete",
+        "messageDeleteBulk"
+    ],
+    "GuildMessageReactions": [
+        "messageReactionAdd",
+        "messageReactionRemove",
+        "messageReactionRemoveAll",
+        "messageReactionRemoveEmoji"
+    ],
+    "GuildMessageTyping": [
+        "typingStart"
+    ],
+    "GuildScheduledEvents": [
+        "guildScheduledEventCreate",
+        "guildScheduledEventUpdate",
+        "guildScheduledEventDelete",
+        "guildScheduledEventUserAdd",
+        "guildScheduledEventUserRemove"
+    ],
+    "DirectMessages": [
+        "messageCreate",
+        "messageUpdate",
+        "messageDelete",
+        "channelPinsUpdate"
+    ],
+    "DirectMessageReactions": [
+        "messageReactionAdd",
+        "messageReactionRemove",
+        "messageReactionRemoveAll",
+        "messageReactionRemoveEmoji"
+    ],
+    "DirectMessageTyping": [
+        "typingStart"
+    ],
+    "AutoModerationConfiguration": [
+        "autoModerationRuleCreate",
+        "autoModerationRuleUpdate",
+        "autoModerationRuleDelete"
+    ],
+    "AutoModerationExecution": [
+        "autoModerationActionExecution"
+    ]
+}

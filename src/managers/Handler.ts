@@ -17,7 +17,7 @@ export class HandlerManager {
         }
 
         function existsDir(handlerName: string) {
-            return existsSync(path.join(client.rootPath, handlerName));
+            return existsSync(path.join(client.targetPath, handlerName));
         }
     }
 }

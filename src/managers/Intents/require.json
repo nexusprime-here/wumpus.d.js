@@ -1,0 +1,18 @@
+{
+    "GuildMembers": ["Guilds"],
+    "GuildWebhooks": ["Guilds"],
+    "GuildIntegrations": ["Guilds"],
+    "GuildEmojisAndStickers": ["Guilds"],
+    "GuildBans": ["Guilds"],
+    "GuildInvites": ["Guilds"],
+    "GuildVoiceStates": ["Guilds"],
+    "GuildPresences": ["Guilds"],
+    "GuildMessages": ["Guilds", "MessageContent"],
+    "GuildMessageReactions": ["Guilds"],
+    "GuildMessageTyping": ["Guilds"],
+    "GuildScheduledEvents": ["Guilds"],
+    "DirectMessages": ["MessageContent"],
+    "DirectMessageReactions": ["DirectMessages"],
+    "DirectMessageTyping": ["DirectMessages"]
+
+}

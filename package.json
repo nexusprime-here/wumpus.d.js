@@ -6,7 +6,7 @@
   "types": "./typings/index.d.ts",
   "scripts": {
     "start": "ts-node src/",
-    "test": "ts-node -T src/ --debug",
+    "test": "cd test && ts-node ../src --debug",
     "build": "tsc && tsc --build tsconfig.typings.json"
   },
   "dependencies": {

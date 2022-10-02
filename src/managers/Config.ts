@@ -1,5 +1,6 @@
 import { existsSync } from "fs";
 import path from "path";
+import { WumpusClient } from "../client";
 
 export class ConfigManager {
     handlers: {
@@ -10,7 +11,8 @@ export class ConfigManager {
         commands: true,
         events: true
     }
-    typescript: boolean = false;
+    intents: WumpusClient['options']['intents'] = [];
+    targetDir: string = './';
 
     constructor(...paths: string[]) {
         const selectedPath = path.join(...paths);

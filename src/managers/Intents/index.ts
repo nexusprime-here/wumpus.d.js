@@ -1,46 +1,44 @@
-import { GatewayIntentsString, IntentsBitField } from 'discord.js';
-import { WumpusClient } from '../../client';
-import { Logger } from '../../utils';
+// import { GatewayIntentsString, IntentsBitField } from 'discord.js';
+// import { WumpusClient } from '../../client';
 
-export class Intent {
-    name: string;
-    events: string[];
-    require?: Intent[];
+// export class Intent {
+//     name: GatewayIntentsString;
+//     events: string[];
+//     require?: Intent[];
 
-    constructor(obj: Intent) {
-        this.name = obj.name;
-        this.events = obj.events;
-        this.require = obj.require;
-    }
-}
+//     constructor(obj: Intent) {
+//         this.name = obj.name;
+//         this.events = obj.events;
+//         this.require = obj.require;
+//     }
+// }
 
-import * as data from './data';
+// import * as data from './data';
 
-export class IntentsManager {
-    private static client: WumpusClient;
-    private static usedIntents: string[] = [];
+// export class IntentsManager {
+//     private static usedIntents: string[] = [];
+//     private static clientIntent: IntentsBitField
 
-    constructor(client: WumpusClient) {
-        IntentsManager.client = client;
-    }
+//     constructor(intents: WumpusClient['options']['intents']) {
+//         IntentsManager.clientIntent = <IntentsBitField>intents;
+//         IntentsManager.clientIntent = new IntentsBitField();
+//     }
     
-    static pushByEvent(selectedEvent: string) {
-        const walkIn = (data: Intent[], isRequire: boolean = false) => {
-            for(const intent of data) {
-                if(!isRequire && !intent.events.includes(selectedEvent)) continue; 
-                if(this.usedIntents.find(i => i === intent.name)) continue;
-                
-                Logger.debug('Intent loaded: ' + intent.name);
+//     static pushByEvent(selectedEvent: string) {
 
-                if(intent.require) walkIn(intent.require, true);
+//         const walk = (data: Intent[]) => {
+//             for(const {name, events, require} of data) {
+//                 if(events.includes(selectedEvent)) continue;
+//                 if(this.usedIntents.includes(name)) continue;
 
-                this.usedIntents.push(intent.name);
-                
-                this.client.options.intents = 0;
-                this.client.options.intents += IntentsBitField.resolve(<GatewayIntentsString>intent.name);
-            }
-        }
+//                 this.clientIntent.add(name);
 
-        walkIn(Object.values(data));
-    }
-}
+//                 if(require) {
+//                     walk(require);
+//                 }
+//             }
+//         }
+
+//         walk(Object.values(data));
+//     }
+// }
