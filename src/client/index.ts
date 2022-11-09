@@ -1,14 +1,16 @@
 import dotenv from 'dotenv';
 import { Awaitable, Client, ClientEvents, ClientOptions, Guild } from "discord.js";
-import { CacheManager, ConfigManager, HandlerManager } from "../managers";
-import { EnvVar } from "../utils";
+import { CacheManager, ConfigManager } from "../managers";
 import path from 'path';
+import _ from 'lodash';
+import { existsSync, readdirSync } from 'fs';
+import { EnvVar } from '../structures';
 
 const ROOT_PATH = process.cwd();
 
 dotenv.config({ path: path.join(ROOT_PATH, '.env') });
 
-const TEST_GUILD = EnvVar('TEST_GUILD');
+const TEST_GUILD = EnvVar.get('TEST_GUILD');
 
 export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready> {
     /**
@@ -27,17 +29,13 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
      * Config of Framework /
      * Configuração do Framework
      */
-    public config = new ConfigManager(ROOT_PATH, 'wumpus.config.json');
+    public config: ConfigManager;
 
     /**
      * Path of the folder where it was run /
      * Caminho da pasta onde foi executado
      */
-    public targetPath = (() => {
-        const rootPath = ROOT_PATH;
-
-        return path.resolve(rootPath, this.config.targetDir);
-    })();
+    public targetPath: string;
     
     /**
      * Active or disable commands and events /
@@ -45,20 +43,31 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
      */
     public cache = new CacheManager(ROOT_PATH);
 
-    /**
-     * Folders that will have the exported files /
-     * Pastas que terão os arquivos exportados
-     */
-    public handlers: HandlerManager;
+    constructor(options: ClientOptions = { intents: [] }) {
+        const config = new ConfigManager(ROOT_PATH, 'wumpus.config.json');
 
-    constructor(options?: ClientOptions) {
-        super((() => options = { intents: this.config.intents })());
+        options.intents = config.intents;
 
-        this.handlers = new HandlerManager({
-            client: this,
-            path: this.targetPath,
-            config: this.config.handlers
-        });
+        super(options);
+
+        this.config = config;
+        this.targetPath = path.resolve(ROOT_PATH, this.config.targetDir);
+
+        for(const [ handlerName, on ] of Object.entries(config.handlers)) {
+            if(!on) continue;
+
+            const handlerPath = path.join(this.targetPath, handlerName);
+            if(!existsSync(handlerPath)) continue;
+
+            for(const fileName of readdirSync(handlerName)) {
+                require(path.join(handlerPath, fileName));
+            }
+        }
+
+        const loadFile = require(path.join(this.targetPath, 'load'));
+        if(typeof loadFile === 'function') {
+            loadFile(this);
+        }
     }
 
     public async login(token?: string | undefined): Promise<string> {

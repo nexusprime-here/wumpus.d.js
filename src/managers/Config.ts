@@ -5,8 +5,7 @@ import { WumpusClient } from "../client";
 export class ConfigManager {
     handlers: {
         commands: boolean,
-        events: boolean,
-        // components: boolean
+        events: boolean
     } = {
         commands: true,
         events: true

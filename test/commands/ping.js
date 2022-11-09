@@ -1,7 +1,6 @@
-/**
- * @type {import('../../typings')}
- */
-const Ping = new WuCommand({
+import '../../'
+
+const Ping = new WumpusCommand({
     name: 'ping',
     description: 'Envia pong!',
     test: true,

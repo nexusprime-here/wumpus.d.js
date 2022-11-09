@@ -1,48 +1,36 @@
-import limitLength from "../utils/decorators/limitLength";
 import { ClientEvents } from "discord.js";
 import { WumpusClient } from "../client";
+import { client } from "../client/instance";
 
-interface EventHandlerOptions {
-    client: WumpusClient
+export declare class EventData<Type extends keyof ClientEvents> {
+    name: string
+    type: Type;
+    once?: boolean;
 }
 
-export class Event<K extends keyof ClientEvents = any> {
-    /**
-     * Event identification name /
-     * Nome de identificação do evento
-     */
-    @limitLength({ max: 32 })
-    public name: string;
+export class Event<Type extends keyof ClientEvents> {
+    public data: EventData<Type>;
+    public run: (
+        options: { client: WumpusClient }, 
+        ...args: ClientEvents[Type]
+    ) => Promise<any>
     
-    /**
-     * Event that will be listened /
-     * Evento que será ouvido
-     */
-    type: K;
-    
-    /**
-     * If is true, the event will be listened just one time /
-     * Se for true, o evento será ouvido apenas uma vez
-     */
-    once: boolean = false;
-
-    /**
-     * The function that will executed when event called /
-     * A função que será executada quando o evento for chamado
-     */
-    run: (options: EventHandlerOptions, ...args: ClientEvents[K]) => any;
-    
-    register(client: WumpusClient) {
-        client[this.once ? 'once' : 'on'](this.type, (...args) => this.run(
-            { client: client }, 
-            ...args
-        ));
+    static register(event: Event<any>) {
+        client[event.data.once ? 'once' : 'on'](
+            <any>event.data.type, 
+            (...args: any) => event.run({ client }, ...args)
+        );
     }
-    
-    constructor(obj: Event<K>) {
-        this.name = obj.name;
-        this.type = obj.type;
-        if(typeof obj.once === 'boolean') this.once = obj.once;
-        this.run = obj.run;
+    static build<T extends keyof ClientEvents>(event: EventData<T> & { run: Event<T>['run'] }) {
+        const { run, ...data } = event;
+
+        const newEvent = new this(data, run);
+
+        Event.register(newEvent)
+    }
+
+    constructor(eventData: EventData<Type>, run: Event<Type>['run']) {
+        this.data = eventData;
+        this.run = run;
     }
 }
