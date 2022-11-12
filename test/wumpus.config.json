@@ -1,6 +1,11 @@
 {
+    "$schema": "../config.schema.json",
     "handlers": {
         "commands": true,
         "events": true
-    }
+    },
+    "intents": [
+        "Guilds",
+        "GuildMessages"
+    ]
 }
