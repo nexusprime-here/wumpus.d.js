@@ -1,6 +1,6 @@
 import { Logger } from "../utils";
 
-export class EnvVar {
+export default class EnvVar {
     static get(name: string, options: {throwError: boolean} = { throwError: false }) {
         let envVar = process.env[name];
 

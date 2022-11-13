@@ -1,10 +1,10 @@
+import EnvVar from '../structures/EnvVar';
+import { ConfigManager } from "../managers";
 import dotenv from 'dotenv';
 import { Awaitable, Client, ClientEvents, ClientOptions, Guild } from "discord.js";
-import { CacheManager, ConfigManager } from "../managers";
 import path from 'path';
 import _ from 'lodash';
 import { existsSync, readdirSync } from 'fs';
-import { EnvVar } from '../structures';
 
 const ROOT_PATH = process.cwd();
 
@@ -36,16 +36,9 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
      * Caminho da pasta onde foi executado
      */
     public targetPath: string;
-    
-    /**
-     * Active or disable commands and events /
-     * Ativa ou desativa comandos e eventos
-     */
-    public cache = new CacheManager(ROOT_PATH);
 
     constructor(options: ClientOptions = { intents: [] }) {
         const config = new ConfigManager(ROOT_PATH, 'wumpus.config.json');
-
         options.intents = config.intents;
 
         super(options);
@@ -53,20 +46,29 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
         this.config = config;
         this.targetPath = path.resolve(ROOT_PATH, this.config.targetDir);
 
-        for(const [ handlerName, on ] of Object.entries(config.handlers)) {
+        this.runHandlers();
+
+        // const loadFilePath = path.join(this.targetPath);
+        // if(existsSync(loadFilePath)) {                
+        //     const loadFile = require(path.join(this.targetPath, 'load'));
+        //     if(typeof loadFile === 'function') {
+        //         loadFile(this);
+        //     }
+        // }
+    }
+
+    private runHandlers() {
+        for(const [ handlerName, on ] of Object.entries(this.config.handlers)) {
             if(!on) continue;
 
-            const handlerPath = path.join(this.targetPath, handlerName);
-            if(!existsSync(handlerPath)) continue;
+            const handlerFolderPath = path.join(this.targetPath, handlerName);
+            if(!existsSync(handlerFolderPath)) continue;
 
-            for(const fileName of readdirSync(handlerName)) {
-                require(path.join(handlerPath, fileName));
-            }
-        }
-
-        const loadFile = require(path.join(this.targetPath, 'load'));
-        if(typeof loadFile === 'function') {
-            loadFile(this);
+            for(const fileName of readdirSync(handlerFolderPath)) (async () => {
+                const fileData = await import(path.join(handlerFolderPath, fileName));
+                // TODO: Terminar isso
+                
+            })();
         }
     }
 

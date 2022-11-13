@@ -1,3 +1,4 @@
+import { IntentsBitField } from "discord.js";
 import { existsSync } from "fs";
 import path from "path";
 import { WumpusClient } from "../client";
@@ -10,7 +11,7 @@ export class ConfigManager {
         commands: true,
         events: true
     }
-    intents: WumpusClient['options']['intents'] = [];
+    intents: WumpusClient['options']['intents'] = new IntentsBitField('Guilds');
     targetDir: string = './';
 
     constructor(...paths: string[]) {

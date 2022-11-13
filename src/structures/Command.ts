@@ -1,7 +1,5 @@
 import { ApplicationCommandOptionData, Client, CommandInteraction, LocalizationMap, Permissions } from "discord.js";
-import { WumpusClient } from "../client";
-import { client } from "../client/instance";
-import { CacheManager } from "../managers";
+import type { WumpusClient } from "../client";
 import { Logger } from "../utils";
 
 export declare class CommandData {
@@ -16,32 +14,34 @@ export declare class CommandData {
     test?: boolean;
 }
 
-export class Command {
+export interface ICommand extends CommandData { run: Command['run'] }
+
+export default class Command {
     private static cache = new Map<string, Command>();
     static {
-        client.on('interactionCreate', interaction => {
+        client.on('interactionCreate', async interaction => {
             if(!interaction.isChatInputCommand()) return;
-
+        
             const foundCommand = this.cache.get(interaction.commandName);
-
+        
             try {
-                foundCommand!.run({
+                await foundCommand!.run({
                     interaction,
                     bot: client
-                });
+                })
             } catch(err) {
-                console.error(`Comando deu errado: ${err}`);
+                Logger.error('CommandExecution: ', <Error>err);
             }
         })
     }
 
-    public data: CommandData;
-    public run: (options: {
+    public data!: CommandData;
+    public run!: (options: {
         interaction: CommandInteraction;
         bot: WumpusClient<true>;
     }) => Promise<any>;
 
-    static register(command: Command) {
+    private static register(command: Command) {
         const commandsAplication = (client as Client<true>).application.commands;
         const testGuildId = client.testGuild?.id;
 
@@ -54,20 +54,10 @@ export class Command {
 
         Logger.debug(`Command ${command.data.name} loaded`);
     }
-    static async build(command: Command['data'] & { run: Command['run'] }) {
+    static async build(command: ICommand) {
         const { run, ...data } = command;
 
-        const newCommand = new this(data, run);
-
-        const isActive = !CacheManager.has || await client.cache.events.get(command.name);
-        if(isActive === false) return;
-
-        this.cache.set(newCommand.data.name, newCommand);
-        Command.register(newCommand);
-    }
-
-    constructor(data: Command['data'], run: Command['run']) {
-        this.data = data;
-        this.run = run;
+        this.cache.set(data.name, { data, run });
+        client.waitReady().then(() => Command.register({ data, run }));
     }
 }

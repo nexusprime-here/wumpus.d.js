@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import { WumpusClient } from ".";
-import { EnvVar } from "../structures";
+import EnvVar from "../structures/EnvVar";
 import { Logger } from "../utils";
 
 const TOKEN = EnvVar.get('TOKEN', { throwError: true });
 
-export const client = new WumpusClient();
+declare global { var client: WumpusClient }
+global.client = new WumpusClient();
 
 client.once('ready', async () => {
     Logger.ready(`Bot logged as ${client.user?.tag}`);
