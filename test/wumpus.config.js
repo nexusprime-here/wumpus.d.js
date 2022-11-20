@@ -1,5 +1,5 @@
-{
-    "$schema": "../config.schema.json",
+/** @type {import('../typings').IConfig} */
+const config = {
     "handlers": {
         "commands": true,
         "events": true
@@ -9,3 +9,5 @@
         "GuildMessages"
     ]
 }
+
+module.exports = config;

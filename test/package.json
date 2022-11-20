@@ -8,8 +8,8 @@
     "wumpuscore": "../"
   },
   "scripts": {
-    "test": "wumpus",
-    "test:path": "ts-node ../src --debug"
+    "test": "wumpus dev",
+    "test:path": "node ../lib/cli dev"
   },
   "keywords": [],
   "author": "",

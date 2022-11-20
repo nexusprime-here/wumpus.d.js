@@ -1,10 +1,12 @@
 import EnvVar from '../structures/EnvVar';
-import { ConfigManager } from "../managers";
+import Command from '../structures/Command';
+import { ConfigManager, HandlersManager } from "../managers";
+import { Logger } from '../utils'
 import dotenv from 'dotenv';
 import { Awaitable, Client, ClientEvents, ClientOptions, Guild } from "discord.js";
 import path from 'path';
 import _ from 'lodash';
-import { existsSync, readdirSync } from 'fs';
+import developerMode from './dev';
 
 const ROOT_PATH = process.cwd();
 
@@ -46,38 +48,27 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
         this.config = config;
         this.targetPath = path.resolve(ROOT_PATH, this.config.targetDir);
 
-        this.runHandlers();
+        HandlersManager.start({
+            client: this,
+            handlers: this.config.handlers,
+            targetPath: this.targetPath
+        });
 
-        // const loadFilePath = path.join(this.targetPath);
-        // if(existsSync(loadFilePath)) {                
-        //     const loadFile = require(path.join(this.targetPath, 'load'));
-        //     if(typeof loadFile === 'function') {
-        //         loadFile(this);
-        //     }
-        // }
+        this.waitReady().then(() => {
+            if(TEST_GUILD) {
+                this.testGuild = this.guilds.cache.get(TEST_GUILD);
+            }
+            
+            Command.listen(this);
+
+            Logger.ready(`Bot logged as ${this.user?.tag}`);
+        });
     }
 
-    private runHandlers() {
-        for(const [ handlerName, on ] of Object.entries(this.config.handlers)) {
-            if(!on) continue;
+    public async login(): Promise<string> {
+        const TOKEN = EnvVar.get('TOKEN', { throwError: true });
 
-            const handlerFolderPath = path.join(this.targetPath, handlerName);
-            if(!existsSync(handlerFolderPath)) continue;
-
-            for(const fileName of readdirSync(handlerFolderPath)) (async () => {
-                const fileData = await import(path.join(handlerFolderPath, fileName));
-                // TODO: Terminar isso
-                
-            })();
-        }
-    }
-
-    public async login(token?: string | undefined): Promise<string> {
-        const promise = await super.login(token);
-
-        if(TEST_GUILD) this.testGuild = this.guilds.cache.get(TEST_GUILD);
-
-        return promise;
+        return super.login(TOKEN);
     }
     
     public waitReady(): Promise<this> {
@@ -105,4 +96,14 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
     
         return bot;
     }
+}
+
+if(require.main === module) {
+    const client = new WumpusClient();
+
+    if (process.argv.includes('dev')) {
+        developerMode(client);
+    }
+
+    client.login();
 }

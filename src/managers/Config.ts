@@ -13,6 +13,7 @@ export class ConfigManager {
     }
     intents: WumpusClient['options']['intents'] = new IntentsBitField('Guilds');
     targetDir: string = './';
+    allowTypeScript: boolean = false;
 
     constructor(...paths: string[]) {
         const selectedPath = path.join(...paths);

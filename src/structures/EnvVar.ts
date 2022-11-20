@@ -2,7 +2,7 @@ import { Logger } from "../utils";
 
 export default class EnvVar {
     static get(name: string, options: {throwError: boolean} = { throwError: false }) {
-        let envVar = process.env[name];
+        let envVar = <string>process.env[name];
 
         if(!envVar) {
             if(options.throwError) {

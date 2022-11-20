@@ -14,34 +14,34 @@ export declare class CommandData {
     test?: boolean;
 }
 
-export interface ICommand extends CommandData { run: Command['run'] }
+interface ICommand extends CommandData { run: Command['run'] }
 
 export default class Command {
-    private static cache = new Map<string, Command>();
-    static {
+    static cache = new Map<string, Command>();
+    
+    public data: CommandData;
+    public run: (options: {
+        interaction: CommandInteraction;
+        bot: WumpusClient<true>;
+    }) => Promise<any>;
+    
+    static listen(client: WumpusClient) {
         client.on('interactionCreate', async interaction => {
             if(!interaction.isChatInputCommand()) return;
         
-            const foundCommand = this.cache.get(interaction.commandName);
+            const foundCommand = Command.cache.get(interaction.commandName);
         
             try {
                 await foundCommand!.run({
                     interaction,
                     bot: client
                 })
-            } catch(err) {
-                Logger.error('CommandExecution: ', <Error>err);
+            } catch (err: any) {
+                Logger.error(`CommandExecution: ${err.message}`, err.stack);
             }
         })
     }
-
-    public data!: CommandData;
-    public run!: (options: {
-        interaction: CommandInteraction;
-        bot: WumpusClient<true>;
-    }) => Promise<any>;
-
-    private static register(command: Command) {
+    static register({ client, command }: { command: Command, client: WumpusClient }) {
         const commandsAplication = (client as Client<true>).application.commands;
         const testGuildId = client.testGuild?.id;
 
@@ -54,10 +54,14 @@ export default class Command {
 
         Logger.debug(`Command ${command.data.name} loaded`);
     }
-    static async build(command: ICommand) {
+    static build(command: ICommand) {
         const { run, ...data } = command;
 
-        this.cache.set(data.name, { data, run });
-        client.waitReady().then(() => Command.register({ data, run }));
+        return new this(run, data);
+    }
+
+    private constructor(run: Command['run'], data: Command['data']) {
+        this.data = data;
+        this.run = run;
     }
 }
