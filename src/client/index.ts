@@ -20,7 +20,7 @@ export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready>
      * Servidor para testar comandos de barra
      */
     public testGuild?: Guild;
-    
+
     /**
      * If client is connected /
      * Se o cliente está conectado
@@ -102,7 +102,11 @@ if(require.main === module) {
     const client = new WumpusClient();
 
     if (process.argv.includes('dev')) {
+        process.env.NODE_ENV = "development";
+
         developerMode(client);
+    } else {
+        process.env.NODE_ENV = "production";
     }
 
     client.login();

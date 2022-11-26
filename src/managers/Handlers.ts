@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "fs";
 import path from "path";
+import { Logger } from "../utils";
 import type { WumpusClient } from "../client";
 import Command from "../structures/Command";
 import Event from "../structures/Event";
@@ -17,18 +18,28 @@ export class HandlersManager {
             const dirPath = path.join(targetPath, 'commands');
             if (!existsSync(dirPath)) return;
             
+            let count = 0;
             for (const fileName of readdirSync(dirPath)) {
                 HandlersManager.loadCommandFile(path.join(dirPath, fileName));
+
+                count++;
             }
+
+            Logger.debug(`${count} commands are loaded`);
         })
         
         if (events) {
             const dirPath = path.join(targetPath, 'events');
             if (!existsSync(dirPath)) return;
     
+            let count = 0;
             for (const fileName of readdirSync(dirPath)) {
                 HandlersManager.loadEventFile(path.join(dirPath, fileName));
+
+                count++;
             }
+            
+            Logger.debug(`${count} events are loaded`);
         }
     }
 

@@ -15,5 +15,9 @@ export default class EnvVar {
         return envVar;
     }
 
+    static set(name: Uppercase<string>, value: string) {
+        process.env[name] = value;
+    }
+
     private constructor() {};
 }

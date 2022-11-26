@@ -4,12 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "caller-path": "^4.0.0",
     "wumpuscore": "../"
   },
   "scripts": {
-    "test": "wumpus dev",
-    "test:path": "node ../lib/cli dev"
+    "test": "node ../lib/cli"
   },
   "keywords": [],
   "author": "",

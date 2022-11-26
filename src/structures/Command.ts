@@ -11,7 +11,6 @@ export declare class CommandData {
     default_permission?: boolean;
     default_member_permissions?: Permissions | null;
     dm_permission?: boolean;
-    test?: boolean;
 }
 
 interface ICommand extends CommandData { run: Command['run'] }
@@ -31,8 +30,14 @@ export default class Command {
         
             const foundCommand = Command.cache.get(interaction.commandName);
         
+            if(!foundCommand) {
+                Logger.error(`CommandExecution: The command ${interaction.commandName} not found on cache`);
+
+                return;
+            }
+
             try {
-                await foundCommand!.run({
+                await foundCommand.run({
                     interaction,
                     bot: client
                 })
@@ -47,12 +52,10 @@ export default class Command {
 
         commandsAplication.create(
             command.data,
-            command.data.test 
+            process.env.NODE_ENV === 'development' 
                 ? testGuildId 
                 : undefined
         );
-
-        Logger.debug(`Command ${command.data.name} loaded`);
     }
     static build(command: ICommand) {
         const { run, ...data } = command;

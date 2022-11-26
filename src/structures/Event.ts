@@ -6,7 +6,7 @@ export declare class EventData<Type extends keyof ClientEvents> {
     type: Type;
     once?: boolean;
 }
-/** WARNING: some property types won't work without Event.Build */
+
 interface IEvent<T extends keyof ClientEvents> extends EventData<T> { run: Event<T>['run'] }
 
 export default class Event<Type extends keyof ClientEvents> {
