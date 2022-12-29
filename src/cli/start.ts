@@ -41,15 +41,14 @@ process.stdin.on('keypress', async (ch, key) => {
 
         await sleep(500);
         
-        logTips()
+        logTips();
         client = runNewClient();
     }
 });
 
 function runNewClient() {
     const client = spawn('node', [
-        path.join(__dirname, '../client/index.js'),
-        'dev'
+        path.join(__dirname, '../client/dev.js')
     ]);
 
     client.stderr.on('data', data => {

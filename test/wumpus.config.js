@@ -1,4 +1,4 @@
-/** @type {import('../typings').IConfig} */
+/** @type {import('../typings').WumpusConfig} */
 const config = {
     "handlers": {
         "commands": true,
@@ -7,7 +7,14 @@ const config = {
     "intents": [
         "Guilds",
         "GuildMessages"
-    ]
+    ],
+    "embeds": {
+        "warn": {
+            "showAuthor": false,
+            "footer": "sexo",
+            "color": "DarkAqua"
+        }
+    },
 }
 
 module.exports = config;

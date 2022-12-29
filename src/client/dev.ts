@@ -1,27 +1,52 @@
-import { watch } from 'chokidar';
 import path from "path";
 import { HandlersManager } from "../managers";
-import type { WumpusClient } from ".";
-import { Logger } from '../utils';
+import { WumpusClient } from ".";
+import EnvVar from "../structures/EnvVar";
+import Command from '../structures/Command';
+import type { Guild } from "discord.js";
 
-export default function developerMode(client: WumpusClient) {
-    const commandDirPath = path.join(client.targetPath, 'commands');
+export class DevelopmentClient extends WumpusClient {
+    /**
+     * Guild for test slash commands /
+     * Servidor para testar comandos de barra
+     */
+    public testGuild?: Guild;
     
-    const watcher = watch(commandDirPath, { 
-        interval: 3000, 
-        ignoreInitial: true 
-    });
+    /**
+     * Path of the folder where it was run /
+     * Caminho da pasta onde foi executado
+     */
+    public targetPath: string;
 
-    watcher.on('all', async (event, f) => {
-        if(event === 'change') {
-            Logger.warn(`Reloading some commands...`);
+    constructor() {
+        super();
 
-            delete require.cache[require.resolve(f)];
-            await HandlersManager.loadCommandFile(f);
-        } else if(['add', 'addDir'].includes(event)) {
-            Logger.warn('Loading new commands...');
+        EnvVar.set('NODE_ENV', 'development');
+
+        this.targetPath = path.resolve(process.cwd(), this.config.targetDir);
+
+        HandlersManager.watch({
+            client: this,
+            handlers: this.config.handlers,
+            targetPath: this.targetPath
+        });
+
+        this.waitReady().then(() => {
+            const testGuild = EnvVar.get('TEST_GUILD');
             
-            await HandlersManager.loadCommandFile(f);
-        }
-    });
+            if (testGuild) {
+                this.testGuild = this.guilds.cache.get(testGuild);
+            }
+
+            if (this.config.handlers.commands) {
+                Command.listen(this);
+            }
+        });
+    }
+}
+
+if (require.main === module) {
+    const client = new DevelopmentClient();
+
+    client.run();
 }

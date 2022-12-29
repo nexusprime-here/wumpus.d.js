@@ -1,7 +1,7 @@
 import { Logger } from "../utils";
 
 export default class EnvVar {
-    static get(name: string, options: {throwError: boolean} = { throwError: false }) {
+    static get(name: Uppercase<string>, options: {throwError: boolean} = { throwError: false }) {
         let envVar = <string>process.env[name];
 
         if(!envVar) {

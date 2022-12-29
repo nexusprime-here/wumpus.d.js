@@ -57,8 +57,8 @@ export class Logger {
         return true;
     }
     static debug(message: string) {
-        const debug = process.argv.includes('dev');
-        if(!debug) return;
+        const isDebug = process.env.NODE_ENV === 'development';
+        if(!isDebug) return;
         
         let log = chalk.black.bgYellow(`[DEBUG ${this.time}]`);
         log += chalk.yellow(' >> ');
@@ -71,17 +71,19 @@ export class Logger {
 
     static from(log: string) {
         let isStyledLog = /\[[A-Z]{4,}( [0-9]{2}:[0-9]{2}:[0-9]{2})?\] >>/g.test(log);
-
+        
         if(isStyledLog) {
             let [logName, message] = log.split(' >> ');
-            logName = logName.slice(0, -1);
-            logName = logName.slice(1);
+            logName = logName.replace('[', '')
+            logName = logName.replace(']', '')
             logName = logName.split(' ')[0];
             logName = logName.toLowerCase();
         
             this.time = getTime();
-    
-            this[<'warn' | 'error' | 'info' | 'debug'>logName](message);
+
+            if(logName in this) {
+                this[<'warn' | 'error' | 'info' | 'debug'>logName](message)
+            }
         } else {
             this.info(log);
         }
