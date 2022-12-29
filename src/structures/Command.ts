@@ -3,8 +3,9 @@ import type { WumpusClient } from "../client";
 import { Logger } from "../utils";
 import ResponseMethods from "./ResponseMethods";
 
-interface ModifiedCommandInteraction<Cached extends Discord.CacheType = Discord.CacheType>
-    extends Discord.CommandInteraction<Cached>, ResponseMethods { }
+interface ModifiedChatInputCommandInteraction<
+    Cached extends Discord.CacheType = Discord.CacheType
+> extends Discord.ChatInputCommandInteraction<Cached>, ResponseMethods { }
 
 interface ICommand extends CommandData { run: Command['run'] }
 
@@ -24,7 +25,7 @@ export default class Command {
 
     public data: CommandData;
     public run: (options: {
-        interaction: ModifiedCommandInteraction;
+        interaction: ModifiedChatInputCommandInteraction;
         bot: WumpusClient<true>;
     }) => Promise<any>;
 
@@ -44,7 +45,7 @@ export default class Command {
                 Object.assign(interaction, responseMethods);
 
                 await foundCommand.run({
-                    interaction: <ModifiedCommandInteraction>interaction,
+                    interaction: <ModifiedChatInputCommandInteraction>interaction,
                     bot: client
                 });
             } catch (err: any) {
