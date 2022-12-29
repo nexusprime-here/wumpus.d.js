@@ -6,9 +6,11 @@ export default class ResponseMethods<Cached extends Discord.CacheType = Discord.
     private static interaction: Discord.ChatInputCommandInteraction;
     private static config: ConfigManager;
 
+    ephemeralReply = false;
+
     replyError(
         data: string | Discord.EmbedData,
-        options: { ephemeral: boolean } = { ephemeral: false }
+        options: { ephemeral: boolean } = { ephemeral: this.ephemeralReply }
     ): Promise<Discord.InteractionResponse<Discord.BooleanCache<Cached>>> {
         const { config, interaction } = ResponseMethods;
 
@@ -28,7 +30,7 @@ export default class ResponseMethods<Cached extends Discord.CacheType = Discord.
 
     replyWarn(
         data: string | Discord.EmbedData,
-        options: { ephemeral: boolean } = { ephemeral: false }
+        options: { ephemeral: boolean } = { ephemeral: this.ephemeralReply }
     ): Promise<Discord.InteractionResponse<Discord.BooleanCache<Cached>>> {
         const { config, interaction } = ResponseMethods;
 
@@ -46,9 +48,9 @@ export default class ResponseMethods<Cached extends Discord.CacheType = Discord.
         });
     }
 
-    replyInfo(
+    replySuccess(
         data: string | Discord.EmbedData,
-        options: { ephemeral: boolean } = { ephemeral: false }
+        options: { ephemeral: boolean } = { ephemeral: this.ephemeralReply }
     ): Promise<Discord.InteractionResponse<Discord.BooleanCache<Cached>>> {
         const { config, interaction } = ResponseMethods;
 
