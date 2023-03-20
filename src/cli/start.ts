@@ -47,8 +47,8 @@ process.stdin.on('keypress', async (ch, key) => {
 });
 
 function runNewClient() {
-    const client = spawn('node', [
-        path.join(__dirname, '../client/dev.js')
+    const client = spawn('ts-node', [
+        path.join(__dirname, '../client/dev')
     ]);
 
     client.stderr.on('data', data => {

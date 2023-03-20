@@ -1,4 +1,4 @@
-import { APIEmbedField, ColorResolvable, EmbedAuthorData, EmbedFooterData, IntentsBitField, RestOrArray } from "discord.js";
+import { APIEmbedField, ColorResolvable, CommandInteractionOptionResolver, EmbedAuthorData, EmbedFooterData, IntentsBitField, RestOrArray } from "discord.js";
 import { existsSync } from "fs";
 import path from "path";
 import { WumpusClient } from "../client";

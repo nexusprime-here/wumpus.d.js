@@ -6,7 +6,8 @@
   "types": "./typings/index.d.ts",
   "scripts": {
     "build": "tsc && tsc --build tsconfig.typings.json",
-    "test": "cd test && npm run test"
+    "test": "cd test && npm run test",
+    "test:ts": "cd test && npm run test:ts"
   },
   "dependencies": {
     "chalk": "4.1.2",
