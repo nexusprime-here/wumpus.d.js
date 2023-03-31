@@ -30,6 +30,7 @@ process.stdin.on("keypress", async (ch, key) => {
 	readline.cursorTo(process.stdout, 0);
 
 	if (key.ctrl && key.name === "c") {
+		client.kill();
 		process.exit(0);
 	} else if (key.name === "r") {
 		process.stdout.write(`${chalk.blue(">>")} Restarting...`);
@@ -52,7 +53,6 @@ function runNewClient() {
 	});
 
 	client.stderr?.on("data", (data) => {
-		console.log(data.toString("utf-8"));
 		Logger.error(undefined, data);
 	});
 
@@ -61,9 +61,7 @@ function runNewClient() {
 			stdout.write(data);
 		});
 	});
-	client.on("exit", () =>
-		process.stdout.write(`\n${chalk.yellow("!")} Exited`)
-	);
+	client.on("exit", () => stdout.write(`\n${chalk.yellow("!")} Exited`));
 
 	return client;
 }

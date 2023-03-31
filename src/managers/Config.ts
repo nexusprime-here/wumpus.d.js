@@ -23,7 +23,7 @@ export class ConfigManager {
 		commands: true,
 		events: true,
 	};
-	client: D.ClientOptions = { intents: [] };
+	clientOptions: D.ClientOptions = { intents: [] };
 
 	private _targetDir: string = process.cwd();
 	get targetDir() {
@@ -35,28 +35,6 @@ export class ConfigManager {
 
 	allowTypeScript: boolean = false;
 	buildDir: string = path.join(this.targetDir, "build");
-	embeds: {
-		[key in "error" | "warn" | "info"]: EmbedConfig;
-	} = {
-		error: {
-			emoji: ":x:",
-			separator: " | ",
-			title: "Error",
-			color: "Red",
-		},
-		warn: {
-			emoji: ":warning:",
-			separator: " | ",
-			title: "Warn",
-			color: "Yellow",
-		},
-		info: {
-			separator: " | ",
-			title: "Info",
-			color: "NotQuiteBlack",
-		},
-	};
-
 	testGuild?: string;
 
 	constructor(selectedPath = path.join(process.cwd(), "wumpus.config.js")) {

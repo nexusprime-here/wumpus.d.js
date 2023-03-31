@@ -1,12 +1,6 @@
 import type D from "discord.js";
 import type { WumpusClient } from "../client";
 import { Logger } from "../utils";
-import ResponseMethods from "./ResponseMethods";
-
-interface ModifiedChatInputCommandInteraction<
-	Cached extends D.CacheType = D.CacheType
-> extends D.ChatInputCommandInteraction<Cached>,
-		ResponseMethods {}
 
 interface ICommand extends CommandData {
 	run: Command["run"];
@@ -28,7 +22,7 @@ export default class Command {
 
 	public data: CommandData;
 	public run: (options: {
-		interaction: ModifiedChatInputCommandInteraction;
+		interaction: D.ChatInputCommandInteraction;
 		bot: WumpusClient<true>;
 	}) => Promise<any>;
 
@@ -36,7 +30,7 @@ export default class Command {
 		client: WumpusClient,
 		cache: Map<string, Command> = Command.cache
 	) {
-		client.on("interactionCreate", async (interaction) => {
+		client.on("interactionCreate", async (interaction: D.Interaction) => {
 			if (!interaction.isChatInputCommand()) return;
 
 			const foundCommand = cache.get(interaction.commandName);
@@ -49,11 +43,8 @@ export default class Command {
 			}
 
 			try {
-				const responseMethods = ResponseMethods.get(interaction, client.config);
-				Object.assign(interaction, responseMethods);
-
 				await foundCommand.run({
-					interaction: <ModifiedChatInputCommandInteraction>interaction,
+					interaction,
 					bot: client,
 				});
 			} catch (err: any) {

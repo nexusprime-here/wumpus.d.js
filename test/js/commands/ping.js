@@ -1,10 +1,10 @@
 const { WumpusCommand } = require("../../../");
 
 module.exports = WumpusCommand.build({
-	name: "test",
-	description: "Testing the bot",
+	name: "ping",
+	description: "Pong!",
 	options: [],
-	run({ interaction }) {
-		interaction.replyInfo("Tested 😳👍");
+	async run({ interaction }) {
+		interaction.reply("Pong!");
 	},
 });

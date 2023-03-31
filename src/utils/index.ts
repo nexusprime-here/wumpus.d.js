@@ -1,2 +1,1 @@
-export * from './Logger';
-export * from './TemplateEmbed';
+export * from "./Logger";

@@ -29,7 +29,7 @@ export class WumpusClient<
 		}
 		EnvVarManager.config(rootPath);
 
-		super(config.client);
+		super(config.clientOptions);
 
 		this.config = config;
 	}
