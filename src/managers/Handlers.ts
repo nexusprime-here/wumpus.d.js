@@ -7,125 +7,148 @@ import Event from "../structures/Event";
 import { ConfigManager } from "./Config";
 import { watch } from "chokidar";
 
-type Options = { targetPath: string, handlers: ConfigManager['handlers'], client: WumpusClient }
+type Options = {
+	targetPath: string;
+	handlers: ConfigManager["handlers"];
+	client: WumpusClient;
+};
 export class HandlersManager {
-    static client: WumpusClient<boolean>;
+	static client: WumpusClient<boolean>;
 
-    static watch({ targetPath, handlers, client }: Options) {
-        this.client = client;
-        const { commands, events } = handlers;
+	static async watch({ targetPath, handlers, client }: Options) {
+		let loadedAllRequireds = false;
 
-        if (commands) client.waitReady().then(() => {
-            const dirPath = path.join(targetPath, 'commands');
-            if (!existsSync(dirPath)) return;
-            
-            let count = 0;
-            for (const fileName of readdirSync(dirPath)) (async () => {
-                const { data, run } = <Command>await HandlersManager.loadFile({
-                    type: 'command',
-                    path: path.join(dirPath, fileName)
-                });
+		this.client = client;
+		const { commands, events } = handlers;
 
-                Command.register({
-                    command: { data, run },
-                    client: this.client
-                });
+		if (commands)
+			client.waitReady().then(() => {
+				const dirPath = path.join(targetPath, "commands");
+				if (!existsSync(dirPath)) return;
 
-                count++;
-            })();
+				let count = 0;
+				for (const fileName of readdirSync(dirPath))
+					(async () => {
+						const { data, run } = <Command>await HandlersManager.loadFile({
+							type: "command",
+							path: path.join(dirPath, fileName),
+						});
 
-            Logger.debug(`${count} commands are loaded`);
+						Command.register({
+							command: { data, run },
+							client: this.client,
+						});
 
-            const commandWatcher = watch(dirPath, {
-                interval: 3000,
-                ignoreInitial: true
-            });
-            
-            commandWatcher.on('all', async (event, f) => {
-                if (event === 'change') {
-                    Logger.warn(`Reloading some commands...`);
+						count++;
+					})();
 
-                    delete require.cache[require.resolve(f)];
-                    await HandlersManager.loadFile({
-                        type: 'command',
-                        path: f
-                    });
-                } else if (['add', 'addDir'].includes(event)) {
-                    Logger.warn('Loading new commands...');
+				Logger.debug(`${count} commands are loaded`);
 
-                    await HandlersManager.loadFile({
-                        type: 'command',
-                        path: f
-                    });
-                }
-            });
-        })
-        
-        if (events) {
-            const dirPath = path.join(targetPath, 'events');
-            if (!existsSync(dirPath)) return;
-    
-            let count = 0;
-            for (const fileName of readdirSync(dirPath)) {
-                HandlersManager.loadFile({
-                    type: 'event',
-                    path: path.join(dirPath, fileName)
-                });
+				const commandWatcher = watch(dirPath, {
+					interval: 3000,
+					ignoreInitial: true,
+				});
 
-                count++;
-            }
-            
-            Logger.debug(`${count} events are loaded`);
+				commandWatcher.on("all", async (event, f) => {
+					if (event === "change") {
+						Logger.warn(`Reloading some commands...`);
 
-            const eventWatcher = watch(dirPath, {
-                interval: 3000,
-                ignoreInitial: true
-            })
+						delete require.cache[require.resolve(f)];
+						await HandlersManager.loadFile({
+							type: "command",
+							path: f,
+						});
+					} else if (["add", "addDir"].includes(event)) {
+						Logger.warn("Loading new commands...");
 
-            eventWatcher.on('all', async (event, f) => {
-                if (event === 'change') {
-                    Logger.warn(`Reloading some events...`);
+						await HandlersManager.loadFile({
+							type: "command",
+							path: f,
+						});
+					}
+				});
+			});
 
-                    delete require.cache[require.resolve(f)];
-                    await HandlersManager.loadFile({
-                        type: 'event',
-                        path: f
-                    });
-                } else if (['add', 'addDir'].includes(event)) {
-                    Logger.warn('Loading new events...');
+		if (events) {
+			const dirPath = path.join(targetPath, "events");
+			if (!existsSync(dirPath)) return;
 
-                    await HandlersManager.loadFile({
-                        type: 'event',
-                        path: f
-                    });
-                }
-            });
-        }
-    }
+			let count = 0;
+			for (const fileName of readdirSync(dirPath)) {
+				HandlersManager.loadFile({
+					type: "event",
+					path: path.join(dirPath, fileName),
+				});
 
-    static async loadFile({ path, type }: { path: string, type: 'event' | 'command' }) {
-        const file = await import(path);
+				count++;
+			}
 
-        for (const [_, value] of <[string, Command | Event<any>][]>Object.entries(file)) {
-            if (type === 'command') {
-                if (!(value instanceof Command)) continue;
-                
-                const { data, run } = value;
-                
-                Command.cache.set(data.name, { data, run });
-            }
-            else if (type === 'event') {
-                if (!(value instanceof Event)) continue;
+			loadedAllRequireds = true;
+			Logger.debug(`${count} events are loaded`);
 
-                const { data, run } = value;
+			const eventWatcher = watch(dirPath, {
+				interval: 3000,
+				ignoreInitial: true,
+			});
 
-                this.client[data.once ? 'once' : 'on'](
-                    <any>data.type,
-                    (...args: any) => run({ client: this.client }, ...args)
-                );
-            };
+			eventWatcher.on("all", async (event, f) => {
+				if (event === "change") {
+					Logger.warn(`Reloading some events...`);
 
-            return value;
-        }
-    }
+					delete require.cache[require.resolve(f)];
+					await HandlersManager.loadFile({
+						type: "event",
+						path: f,
+					});
+				} else if (["add", "addDir"].includes(event)) {
+					Logger.warn("Loading new events...");
+
+					await HandlersManager.loadFile({
+						type: "event",
+						path: f,
+					});
+				}
+			});
+		}
+
+		return new Promise<void>((resolve) => {
+			while (!loadedAllRequireds) {}
+
+			resolve();
+		});
+	}
+
+	static async loadFile({
+		path,
+		type,
+	}: {
+		path: string;
+		type: "event" | "command";
+	}) {
+		const file = await import(path);
+
+		for (const [_, value] of <[string, Command | Event<any>][]>(
+			Object.entries(file)
+		)) {
+			if (type === "command") {
+				if (!(value instanceof Command)) continue;
+
+				const { data, run } = value;
+
+				Command.cache.set(data.name, { data, run });
+			} else if (type === "event") {
+				if (!(value instanceof Event)) continue;
+
+				const { data, run } = value;
+
+				// TODO: Fix type
+				// @ts-ignore
+				this.client[data.once ? "once" : "on"](<any>data.type, (...args: any) =>
+					run({ client: this.client }, ...args)
+				);
+			}
+
+			return value;
+		}
+	}
 }

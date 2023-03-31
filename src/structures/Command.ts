@@ -1,77 +1,87 @@
-import Discord from "discord.js";
+import type D from "discord.js";
 import type { WumpusClient } from "../client";
 import { Logger } from "../utils";
 import ResponseMethods from "./ResponseMethods";
 
 interface ModifiedChatInputCommandInteraction<
-    Cached extends Discord.CacheType = Discord.CacheType
-> extends Discord.ChatInputCommandInteraction<Cached>, ResponseMethods { }
+	Cached extends D.CacheType = D.CacheType
+> extends D.ChatInputCommandInteraction<Cached>,
+		ResponseMethods {}
 
-interface ICommand extends CommandData { run: Command['run'] }
+interface ICommand extends CommandData {
+	run: Command["run"];
+}
 
 export declare class CommandData {
-    name: string;
-    name_localizations?: Discord.LocalizationMap;
-    description: string;
-    description_localizations?: Discord.LocalizationMap;
-    options: Discord.ApplicationCommandOptionData[];
-    default_permission?: boolean;
-    default_member_permissions?: Discord.Permissions | null;
-    dm_permission?: boolean;
+	name: string;
+	name_localizations?: D.LocalizationMap;
+	description: string;
+	description_localizations?: D.LocalizationMap;
+	options: D.ApplicationCommandOptionData[];
+	default_permission?: boolean;
+	default_member_permissions?: D.Permissions | null;
+	dm_permission?: boolean;
 }
 
 export default class Command {
-    static cache = new Map<string, Command>();
+	static cache = new Map<string, Command>();
 
-    public data: CommandData;
-    public run: (options: {
-        interaction: ModifiedChatInputCommandInteraction;
-        bot: WumpusClient<true>;
-    }) => Promise<any>;
+	public data: CommandData;
+	public run: (options: {
+		interaction: ModifiedChatInputCommandInteraction;
+		bot: WumpusClient<true>;
+	}) => Promise<any>;
 
-    static listen(client: WumpusClient, cache: Map<string, Command> = Command.cache) {
-        client.on('interactionCreate', async (interaction) => {
-            if (!interaction.isChatInputCommand()) return;
+	static listen(
+		client: WumpusClient,
+		cache: Map<string, Command> = Command.cache
+	) {
+		client.on("interactionCreate", async (interaction) => {
+			if (!interaction.isChatInputCommand()) return;
 
-            const foundCommand = cache.get(interaction.commandName);
-            if (!foundCommand) {
-                Logger.error(`CommandExecution: The command ${interaction.commandName} not found on cache`);
+			const foundCommand = cache.get(interaction.commandName);
+			if (!foundCommand) {
+				Logger.error(
+					`CommandExecution: The command ${interaction.commandName} not found on cache`
+				);
 
-                return;
-            }
+				return;
+			}
 
-            try {
-                const responseMethods = ResponseMethods.get(interaction, client.config);
-                Object.assign(interaction, responseMethods);
+			try {
+				const responseMethods = ResponseMethods.get(interaction, client.config);
+				Object.assign(interaction, responseMethods);
 
-                await foundCommand.run({
-                    interaction: <ModifiedChatInputCommandInteraction>interaction,
-                    bot: client
-                });
-            } catch (err: any) {
-                Logger.error(`CommandExecution: ${err.message}`, err.stack);
-            }
-        });
+				await foundCommand.run({
+					interaction: <ModifiedChatInputCommandInteraction>interaction,
+					bot: client,
+				});
+			} catch (err: any) {
+				Logger.error(`CommandExecution: ${err.message}`, err.stack);
+			}
+		});
+	}
+	static register({
+		client,
+		command,
+		guild,
+	}: {
+		command: Command;
+		client: WumpusClient;
+		guild?: D.Guild;
+	}) {
+		const commandsAplication = (client as D.Client<true>).application.commands;
 
-    }
-    static register({ client, command, guild }: {
-        command: Command, client: WumpusClient, guild?: Discord.Guild
-    }) {
-        const commandsAplication = (client as Discord.Client<true>).application.commands;
+		commandsAplication.create(command.data, guild?.id);
+	}
+	static build(command: ICommand) {
+		const { run, ...data } = command;
 
-        commandsAplication.create(
-            command.data,
-            guild?.id
-        );
-    }
-    static build(command: ICommand) {
-        const { run, ...data } = command;
+		return new this(run, data);
+	}
 
-        return new this(run, data);
-    }
-
-    private constructor(run: Command['run'], data: Command['data']) {
-        this.data = data;
-        this.run = run;
-    }
+	private constructor(run: Command["run"], data: Command["data"]) {
+		this.data = data;
+		this.run = run;
+	}
 }

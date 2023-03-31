@@ -4,11 +4,10 @@
   "description": "",
   "main": "build/main.js",
   "dependencies": {
-    "wumpus.d.js": "../"
+    "wumpus.d.js": "../../"
   },
   "scripts": {
-    "test": "node ../lib/cli",
-    "test:ts": "ts-node ../src/cli"
+    "start": "node ../../lib/cli"
   },
   "keywords": [],
   "author": "",

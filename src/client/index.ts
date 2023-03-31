@@ -1,78 +1,61 @@
-import EnvVar from '../structures/EnvVar';
-import { ConfigManager } from "../managers";
-import dotenv from 'dotenv';
-import { Awaitable, Client, ClientEvents, ClientOptions } from "discord.js";
-import path from 'path';
-import _ from 'lodash';
-import { Logger } from '../utils';
+import D from "discord.js";
+import path from "path";
+import _ from "lodash";
+import { ConfigManager, IntentManager } from "../managers";
+import EnvVarManager from "../managers/EnvVar";
+import { Logger } from "../utils";
 
-export class WumpusClient<Ready extends boolean = boolean> extends Client<Ready> {
-    /**
-     * If client is connected /
-     * Se o cliente está conectado
-     */
-    public connected: boolean = false;
-    
-    /**
-     * Config of Framework /
-     * Configuração do Framework
-     */
-    public config: ConfigManager;
+export class WumpusClient<
+	Ready extends boolean = boolean
+> extends D.Client<Ready> {
+	/**
+	 * If client is connected /
+	 * Se o cliente está conectado
+	 */
+	public connected: boolean = false;
 
-    constructor(options?: ClientOptions) {
-        let rootPath = process.cwd();
-        const config = new ConfigManager();
-        
-        const clientOptions = options ?? config.client;
+	/**
+	 * Config of Framework /
+	 * Configuração do Framework
+	 */
+	public config: ConfigManager;
 
-        if (path.basename(rootPath)) {
-            rootPath.substring(0, rootPath.lastIndexOf("/"));
-        }
-        dotenv.config({ path: path.join(rootPath, '.env') });
+	constructor() {
+		let rootPath = process.cwd();
+		const config = new ConfigManager();
 
-        super(clientOptions);
-        
-        this.config = config;
-    }
+		if (path.basename(rootPath)) {
+			rootPath.substring(0, rootPath.lastIndexOf("/"));
+		}
+		EnvVarManager.config(rootPath);
 
-    public async run(token?: string): Promise<void> {
-        if(!token) {
-            token = EnvVar.get('TOKEN', { throwError: true });
-        }
+		super(config.client);
 
-        super.login(token);
-        await this.waitReady();
+		this.config = config;
+	}
 
-        Logger.ready(`Bot logged as ${this.user?.tag}`);
-    }
-    
-    public waitReady(): Promise<this> {
-        return new Promise(resolve => {
-            if (this.connected) return resolve(this);
+	public async run(token?: string): Promise<void> {
+		if (!token) {
+			token = EnvVarManager.get("TOKEN", { throwError: true });
+		}
 
-            this.once('ready', () => resolve(this));
-        });
-    }
+		super.login(token);
+		await this.waitReady();
 
-    public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>): this;
-    public on<S extends string | symbol>(event: Exclude<S, keyof ClientEvents>, listener: (...args: any[]) => Awaitable<void>): this;
-    public on(event: unknown, listener: unknown): this {
-        let bot = super.on(<string>event, <any>listener);
+		Logger.ready(`Bot logged as ${this.user?.tag}`);
+	}
 
-        return bot;
-    }
-    
-    public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>): this;
-    public once<S extends string | symbol>(event: Exclude<S, keyof ClientEvents>, listener: (...args: any[]) => Awaitable<void>): this;
-    public once(event: unknown, listener: unknown): this {
-        let bot = super.on(<string>event, <any>listener);
-    
-        return bot;
-    }
+	public waitReady(): Promise<this> {
+		return new Promise((resolve) => {
+			if (this.connected) return resolve(this);
+
+			this.once("ready", () => resolve(this));
+		});
+	}
 }
 
-if(require.main === module) {
-    const client = new WumpusClient();
+if (require.main === module) {
+	const client = new WumpusClient();
 
-    client.run();
+	client.run();
 }
