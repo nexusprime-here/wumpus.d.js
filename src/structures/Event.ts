@@ -1,6 +1,6 @@
-import { ClientEvents } from "discord.js";
 import { IntentManager, ScopedDiscordEvents } from "../managers";
-import { WumpusClient } from "../client";
+import type { ClientEvents } from "discord.js";
+import type { WumpusClient } from "../client";
 
 export default class Event<Type extends keyof ClientEvents> {
 	public data!: EventData<Type>;
@@ -11,7 +11,6 @@ export default class Event<Type extends keyof ClientEvents> {
 	static build<T extends keyof ClientEvents>(event: IEvent<T>) {
 		const { run, ...data } = event;
 
-		console.log(IntentManager);
 		IntentManager.addEvent(data.type, (data as any).scope);
 
 		return new this(run, data as any);
@@ -22,13 +21,6 @@ export default class Event<Type extends keyof ClientEvents> {
 		this.run = run;
 	}
 }
-
-Event.build({
-	name: "",
-	type: "messageCreate",
-	async run(ctx, channel) {},
-	scope: "all",
-});
 
 type ScopedEventData<Type extends keyof ClientEvents> = {
 	name: string;

@@ -1,4 +1,5 @@
-import Discord from "discord.js";
+import type D from "discord.js";
+import { IntentsBitField } from "discord.js";
 import _ from "lodash";
 import { Logger } from "../utils";
 import type { CamelCase } from "type-fest";
@@ -79,6 +80,8 @@ export class IntentManager {
 		guildMessageReactionRemove: ["Guilds", "GuildMessageReactions"],
 		guildMessageReactionRemoveAll: ["Guilds", "GuildMessageReactions"],
 		guildMessageReactionRemoveEmoji: ["Guilds", "GuildMessageReactions"],
+		directMessageCreate: ["DirectMessages", "MessageContent"],
+		directMessageUpdate: ["DirectMessages", "MessageContent"],
 		directMessageDelete: ["DirectMessages"],
 		directMessageDeleteBulk: ["DirectMessages"],
 		directMessageReactionAdd: ["DirectMessageReactions"],
@@ -105,19 +108,20 @@ export class IntentManager {
 	static cache: Array<CreateIntentMapObj> = [];
 
 	static getIntent() {
-		Logger.debug(`Intents Loaded: [ ${this.cache.join(", ")} ]`);
-
 		const mergedIntents = IntentManager.mergeIntents(
 			this.intentMap,
 			this.cache
 		);
-		const intents = new Discord.IntentsBitField(mergedIntents);
+
+		Logger.debug(`Intents Loaded: [ ${mergedIntents.join(", ")} ]`);
+
+		const intents = new IntentsBitField(mergedIntents);
 
 		return intents;
 	}
 
 	static createIntentMap(obj: {
-		[key in CreateIntentMapObj]?: Array<Discord.GatewayIntentsString>;
+		[key in CreateIntentMapObj]?: Array<D.GatewayIntentsString>;
 	}) {
 		return obj;
 	}
@@ -138,24 +142,20 @@ export class IntentManager {
 			}
 		}
 
-		return mergedIntents as Array<Discord.GatewayIntentsString>;
+		return mergedIntents as Array<D.GatewayIntentsString>;
 	}
 
 	static addEvent(event: DiscordEvents, scope: string) {
 		const translatedEvent =
-			scope === "all"
+			!scope || scope === "all"
 				? event
-				: (_.camelCase(`${scope}-${event}`) as CreateIntentMapObj);
+				: (_.camelCase(`${scope}_${event}`) as CreateIntentMapObj);
 
 		!this.cache.find((e) => event === e) && this.cache.push(translatedEvent);
 	}
 }
 
-console.log("TESTANDOOOO");
-console.log("TESTANDOOOO");
-console.log("TESTANDOOOO");
-
-type DiscordEvents = keyof Discord.ClientEvents;
+type DiscordEvents = keyof D.ClientEvents;
 export type ScopedDiscordEvents = Extract<
 	DiscordEvents,
 	`${"message" | "typingStart" | "channelPinsUpdate"}${string}`

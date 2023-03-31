@@ -3,6 +3,11 @@ import { EmbedBuilder } from "discord.js";
 import { TemplateEmbed } from "../utils";
 import { ConfigManager } from "../managers";
 
+/**
+ * FIXME: Response Methods não está injetando no interaction
+ * TODO: Ver outra maneira de injetar métodos no interaction
+ */
+
 export default class ResponseMethods<Cached extends D.CacheType = D.CacheType> {
 	private static interaction: D.ChatInputCommandInteraction;
 	private static config: ConfigManager;
