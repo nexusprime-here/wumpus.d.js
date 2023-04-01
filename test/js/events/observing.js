@@ -1,10 +1,10 @@
 const { WumpusEvent } = require("../../../");
 
 module.exports = WumpusEvent.build({
-	name: "to de olho",
+	name: "ObservingYou",
 	type: "messageCreate",
 	scope: "direct",
-	run({ client }, message) {
+	async run({ client }, message) {
 		message.react("👀");
 	},
 });

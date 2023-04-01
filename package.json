@@ -1,34 +1,35 @@
 {
-  "name": "wumpus.d.js",
-  "version": "1.1.0",
-  "license": "ISC",
-  "main": "./lib/index.js",
-  "types": "./typings/index.d.ts",
-  "scripts": {
-    "build": "tsc && tsc --build tsconfig.typings.json",
-    "test:js": "cd test/js && npm run start",
-    "test:ts": "cd test && npm run test:ts"
-  },
-  "dependencies": {
-    "chalk": "4.1.2",
-    "chokidar": "^3.5.3",
-    "common-tags": "^1.8.2",
-    "discord.js": "^14.3.0",
-    "dotenv": "^16.0.3",
-    "lodash": "^4.17.21",
-    "prompt-sync": "^4.2.0"
-  },
-  "devDependencies": {
-    "@types/common-tags": "^1.8.1",
-    "@types/dotenv": "^8.2.0",
-    "@types/lodash": "^4.14.186",
-    "@types/node": "^18.7.11",
-    "@types/prompt-sync": "^4.2.0",
-    "ts-node": "^10.9.1",
-    "type-fest": "^3.7.2",
-    "typescript": "^4.8.3"
-  },
-  "bin": {
-    "wumpus": "./lib/cli/index.js"
-  }
+	"name": "wumpus.d.js",
+	"version": "2.0.0",
+	"license": "ISC",
+	"main": "./lib/index.js",
+	"types": "./typings/index.d.ts",
+	"scripts": {
+		"build": "tsc && tsc --build tsconfig.typings.json",
+		"test:js": "cd test/js && npm run start",
+		"test:ts": "cd test/ts && npm run start"
+	},
+	"dependencies": {
+		"chalk": "4.1.2",
+		"chokidar": "^3.5.3",
+		"common-tags": "^1.8.2",
+		"discord.js": "^14.3.0",
+		"dotenv": "^16.0.3",
+		"lodash": "^4.17.21",
+		"prompt-sync": "^4.2.0",
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"@types/common-tags": "^1.8.1",
+		"@types/dotenv": "^8.2.0",
+		"@types/lodash": "^4.14.186",
+		"@types/node": "^18.7.11",
+		"@types/prompt-sync": "^4.2.0",
+		"ts-node": "^10.9.1",
+		"type-fest": "^3.7.2",
+		"typescript": "^4.8.3"
+	},
+	"bin": {
+		"wumpus": "./lib/cli/index.js"
+	}
 }
