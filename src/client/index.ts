@@ -1,8 +1,8 @@
 import D from "discord.js";
 import path from "path";
 import _ from "lodash";
-import { ConfigManager, IntentManager } from "../managers";
-import EnvVarManager from "../managers/EnvVar";
+
+import { ConfigManager, EnvVarManager } from "../managers";
 import { Logger } from "../utils";
 
 export class WumpusClient<
@@ -40,6 +40,9 @@ export class WumpusClient<
 		}
 
 		super.login(token);
+
+		require(this.config.preloadFile)?.(this);
+
 		await this.waitReady();
 
 		Logger.ready(`Bot logged as ${this.user?.tag}`);

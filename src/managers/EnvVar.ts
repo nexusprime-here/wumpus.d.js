@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { Logger } from "../utils";
 
-export default class EnvVarManager {
+export class EnvVarManager {
 	static get(
 		name: Uppercase<string>,
 		options: { throwError: boolean } = { throwError: false }

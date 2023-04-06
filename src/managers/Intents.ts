@@ -4,8 +4,6 @@ import _ from "lodash";
 import { Logger } from "../utils";
 import type { CamelCase } from "type-fest";
 
-// TODO: File not loading
-
 export class IntentManager {
 	// TODO: Check if has missing important events or intents
 	private static intentMap = this.createIntentMap({

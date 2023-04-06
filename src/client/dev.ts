@@ -1,7 +1,6 @@
 import path from "path";
-import { HandlersManager, IntentManager } from "../managers";
+import { HandlersManager, IntentManager, EnvVarManager } from "../managers";
 import { WumpusClient } from ".";
-import EnvVarManager from "../managers/EnvVar";
 import Command from "../structures/Command";
 import type D from "discord.js";
 

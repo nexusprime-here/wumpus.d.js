@@ -37,6 +37,14 @@ export class ConfigManager {
 	buildDir: string = path.join(this.targetDir, "build");
 	testGuild?: string;
 
+	private _preloadFile: string = process.cwd();
+	get preloadFile() {
+		return this._preloadFile;
+	}
+	set preloadFile(targetDir) {
+		this._preloadFile = path.join(process.cwd(), targetDir);
+	}
+
 	constructor(selectedPath = path.join(process.cwd(), "wumpus.config.js")) {
 		if (!existsSync(selectedPath)) return;
 
