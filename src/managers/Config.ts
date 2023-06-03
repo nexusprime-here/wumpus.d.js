@@ -45,10 +45,13 @@ export class ConfigManager {
 		this._preloadFile = path.join(process.cwd(), targetDir);
 	}
 
-	constructor(selectedPath = path.join(process.cwd(), "wumpus.config.js")) {
-		if (!existsSync(selectedPath)) return;
+	constructor(selectedFolderPath = process.cwd()) {
+		if (!existsSync(selectedFolderPath)) return;
 
-		let configFile: ConfigManager = require(selectedPath);
+		let configFile: ConfigManager = require(path.join(
+			selectedFolderPath,
+			"wumpus.config.js"
+		));
 
 		const keysOfConfigFile = Object.keys(configFile) as Array<
 			keyof ConfigManager

@@ -3,6 +3,9 @@ import { ChildProcess, spawn } from "child_process";
 import path from "path";
 import readline from "readline";
 import { Logger } from "../utils";
+import { ConfigManager } from "../managers";
+
+const config = new ConfigManager(process.cwd());
 
 // Configuring input
 readline.emitKeypressEvents(process.stdin);
@@ -15,7 +18,7 @@ function logTips() {
 	console.log(`${chalk.blue(">>")} You are running on dev mode`);
 
 	const tips = {
-		r: "Reload",
+		R: "Reload",
 		"Ctrl+C": "Stop process",
 	};
 
@@ -50,7 +53,7 @@ process.stdin.on("keypress", async (ch, key) => {
 
 function startClientProcess(): ChildProcess {
 	const clientProcess = spawn(
-		"ts-node",
+		config.allowTypeScript ? "ts-node" : "node",
 		[path.join(__dirname, "../client/dev")],
 		{
 			stdio: "inherit",
